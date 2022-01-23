@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_jd/routers/router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'colors.dart';
 
 void main() {
   runApp(JD());
@@ -17,10 +18,13 @@ class _JDState extends State<JD> {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: Size(750, 1334),//配置设计稿的宽度高度
+      designSize: Size(720, 1520),//配置设计稿的宽度高度
       builder: () => MaterialApp(
         initialRoute: '/',
         onGenerateRoute: onGenerateRoute,
+        theme: ThemeData(
+          primarySwatch: primaryWhite,
+        ),
         builder: (context, widget) {
           ScreenUtil.setContext(context);
           return MediaQuery(

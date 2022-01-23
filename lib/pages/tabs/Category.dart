@@ -3,6 +3,7 @@ import 'package:flutter_jd/services/ScreenAdapter.dart';
 import 'package:flutter_jd/config/Api.dart';
 import 'package:flutter_jd/model/CateModel.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_jd/widget/LoadingWidget.dart';
 
 class CategoryPage extends StatefulWidget {
   CategoryPage({Key? key}) : super(key: key);
@@ -11,7 +12,8 @@ class CategoryPage extends StatefulWidget {
   _CategoryPageState createState() => _CategoryPageState();
 }
 
-class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClientMixin {
+class _CategoryPageState extends State<CategoryPage>
+    with AutomaticKeepAliveClientMixin {
   int _selectIndex = 0;
   List _leftCateList = [];
   List _rightCateList = [];
@@ -29,7 +31,7 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
   }
 
   /// 获取轮播图数据
-  _getLeftCateData() async{
+  _getLeftCateData() async {
     var result = await Dio().get(Api.pcate);
     var cateList = CateModel.fromJson(result.data);
 
@@ -41,7 +43,7 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
   }
 
   /// 获取轮播图数据
-  _getRightCateData(pid) async{
+  _getRightCateData(pid) async {
     var result = await Dio().get('${Api.pcate}?pid=${pid}');
     var cateList = CateModel.fromJson(result.data);
 
@@ -50,7 +52,7 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
     });
   }
 
-  Widget _leftCateWidget(){
+  Widget _leftCateWidget() {
     double leftWidth = ScreenAdapter.getScreenWidth() / 4;
 
     Widget _widget;
@@ -61,11 +63,11 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
         height: double.infinity,
         child: ListView.builder(
           itemCount: _leftCateList.length,
-          itemBuilder: (context, index){
+          itemBuilder: (context, index) {
             return Column(
               children: <Widget>[
                 InkWell(
-                  onTap: (){
+                  onTap: () {
                     setState(() {
                       _selectIndex = index;
                     });
@@ -75,8 +77,11 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
                     width: double.infinity,
                     height: ScreenAdapter.height(84),
                     alignment: Alignment.center,
-                    color: _selectIndex == index ? Color.fromRGBO(240, 246, 246, 0.9) : Colors.white,
-                    child: Text(_leftCateList[index].title, textAlign: TextAlign.center),
+                    color: _selectIndex == index
+                        ? Color.fromRGBO(240, 246, 246, 0.9)
+                        : Colors.white,
+                    child: Text(_leftCateList[index].title,
+                        textAlign: TextAlign.center),
                   ),
                 ),
                 Divider(height: 1),
@@ -95,14 +100,16 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
     return _widget;
   }
 
-  Widget _rightCateWidget(){
+  Widget _rightCateWidget() {
     Widget _widget;
 
     if (_rightCateList.length > 0) {
       double sideSeparator = 10;
       double separator = 10;
-      double textHeight = ScreenAdapter.height(28);
-      double rightItemWidth = (ScreenAdapter.getScreenWidth() - sideSeparator * 2 - separator * 2) / 3;
+      double textHeight = ScreenAdapter.height(36);
+      double rightItemWidth =
+          (ScreenAdapter.getScreenWidth() - sideSeparator * 2 - separator * 2) /
+              3;
       rightItemWidth = ScreenAdapter.width(rightItemWidth);
       double rightItemHeight = rightItemWidth + textHeight;
 
@@ -115,28 +122,35 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
           child: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
-              childAspectRatio: rightItemWidth/rightItemHeight,
-              crossAxisSpacing: separator, 
+              childAspectRatio: rightItemWidth / rightItemHeight,
+              crossAxisSpacing: separator,
               mainAxisSpacing: separator,
             ),
             itemCount: _rightCateList.length,
-            itemBuilder: (context, index){
+            itemBuilder: (context, index) {
               String imagePath = _rightCateList[index].pic;
               String path = Api.Host + imagePath.replaceAll('\\', '/');
 
-              return Container(
-                child: Column(
-                  children: <Widget>[
-                    AspectRatio(
-                      aspectRatio: 1/1,
-                      child: Image.network('${path}', fit: BoxFit.cover),
-                    ),
-                    Container(
-                      height: textHeight,
-                      child: Text('${_rightCateList[index].title}'),
-                    ),
-                  ],
+              return InkWell(
+                child: Container(
+                  child: Column(
+                    children: <Widget>[
+                      AspectRatio(
+                        aspectRatio: 1 / 1,
+                        child: Image.network('${path}', fit: BoxFit.cover),
+                      ),
+                      Container(
+                        height: textHeight,
+                        child: Text('${_rightCateList[index].title}'),
+                      ),
+                    ],
+                  ),
                 ),
+                onTap: () {
+                  Navigator.pushNamed(context, '/productList', arguments: {
+                    'cid': _rightCateList[index].sId,
+                  });
+                },
               );
             },
           ),
@@ -145,14 +159,10 @@ class _CategoryPageState extends State<CategoryPage> with AutomaticKeepAliveClie
     } else {
       _widget = Expanded(
         flex: 1,
-        child: Container(
-          height: double.infinity,
-          color: Color.fromRGBO(240, 246, 246, 0.9),
-          child: Text('加载中...'),
-        ),
+        child: LoadingWidget(),
       );
     }
-    
+
     return _widget;
   }
 
