@@ -3,6 +3,7 @@ import 'package:flutter_jd/pages/tabs/Home.dart';
 import 'package:flutter_jd/pages/tabs/Category.dart';
 import 'package:flutter_jd/pages/tabs/Cart.dart';
 import 'package:flutter_jd/pages/tabs/User.dart';
+import 'package:flutter_jd/services/ScreenAdapter.dart';
 
 class Tabs extends StatefulWidget {
   Tabs({Key? key}) : super(key: key);
@@ -31,7 +32,40 @@ class _TabsState extends State<Tabs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('JDshop')),
+        appBar: _currentIndex != 3
+        ?AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.center_focus_weak),
+            onPressed: (){},
+          ),
+          title: InkWell(
+            onTap: (){
+              Navigator.pushNamed(context, '/search');
+            },
+            child: Container(
+              height: ScreenAdapter.height(70),
+              padding: EdgeInsets.only(left: 10),
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(233, 233, 233, 0.8),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.search),
+                  Text('笔记本', style: TextStyle(fontSize: ScreenAdapter.size(28))),
+                ],
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.message, size: 28, color: Colors.black87),
+              onPressed: (){},
+            ),
+          ],
+        )
+        :AppBar(title: Text('用户中心')),
         /*
         body: IndexedStack(//这个组件可以保持页面的数据状态（适用于所有页面保持状态）
           index: this._currentIndex,//根据这个索引判断显示第几个页面
@@ -41,10 +75,16 @@ class _TabsState extends State<Tabs> {
         body: PageView(
           controller: _pageController,
           children: _pageList,
+          onPageChanged: (index){
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          physics: NeverScrollableScrollPhysics(),//禁止页面触摸滑动
         ),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
-          fixedColor: Colors.red,
+          fixedColor: Colors.amber,
           currentIndex: _currentIndex,
           onTap: (index){
             setState(() {

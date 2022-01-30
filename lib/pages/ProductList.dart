@@ -3,6 +3,7 @@ import 'package:flutter_jd/services/ScreenAdapter.dart';
 import 'package:flutter_jd/config/Api.dart';
 import 'package:flutter_jd/model/ProductModel.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_jd/services/SearchServices.dart';
 import 'package:flutter_jd/widget/LoadingWidget.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -16,12 +17,15 @@ class ProductListPage extends StatefulWidget {
 class _ProductListPageState extends State<ProductListPage> {
   //在这个子类中用 widget 来可以访问父类的属性，比如 arguments
   
+  var _cid;
+  var _keywords;
   int _page = 1;
   int _pageSize = 8;
   List _productList = [];
   String _sort = '';
   bool _flag = true;//数据请求开关，解决重复请求的问题
   bool _noMore = false;//是否数据请求完毕
+  bool _firstPageNoData = false;
   //自定义按钮调用系统事件时，先配置以下内容（固定写法）
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   //用于上拉分页
@@ -35,9 +39,18 @@ class _ProductListPageState extends State<ProductListPage> {
   ];
   int _selectedHeaderID = 1;
 
+  //配置search搜索框的值
+  var _initKeywordsController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+
+    _cid = widget.arguments!['cid'];
+    _keywords = widget.arguments!['keywords'];
+
+    //给seach框赋值
+    _initKeywordsController.text = _keywords.toString();
     
     _getProductListData();
     //监听滚动条滚动事件
@@ -60,11 +73,26 @@ class _ProductListPageState extends State<ProductListPage> {
     });
 
     bool hasMore = true;
-    var result = await Dio().get('${Api.plist}?cid=${widget.arguments!["cid"]}&page=${_page}&pageSize=${_pageSize}&sort=${_sort}');
+
+    var api;
+    if (_keywords == null) {
+      api = '${Api.plist}?cid=${_cid}&page=${_page}&pageSize=${_pageSize}&sort=${_sort}';
+    } else {
+      api = '${Api.plist}?search=${_keywords}&page=${_page}&pageSize=${_pageSize}&sort=${_sort}';
+    }
+    print(api);
+    
+    var result = await Dio().get(api);
     var productList = ProductModel.fromJson(result.data);
 
     if (productList.result!.toList().length < _pageSize) {
       hasMore = false;
+    }
+
+    if (_page == 1 && productList.result!.toList().length == 0) {
+      setState(() {
+        _firstPageNoData = true;
+      });
     }
 
     setState(() {
@@ -266,10 +294,58 @@ class _ProductListPageState extends State<ProductListPage> {
     return Scaffold(
       key: _scaffoldKey,//给当前的 Scaffold 唯一的key
       appBar: AppBar(
-        title: Text('商品列表'),
-        //leading: Text(''),//控制顶部左侧按钮，此行表示隐藏返回按钮
-        actions: <Widget>[//控制顶部右侧的功能按钮
-          Text(''),//隐藏右侧的 Drawer 组件控制按钮
+        leading: Builder(
+          builder: (BuildContext context) {
+            final ScaffoldState? scaffold = Scaffold.maybeOf(context);
+            final ModalRoute<Object?>? parentRoute = ModalRoute.of(context);
+            final bool hasEndDrawer = scaffold?.hasEndDrawer ?? false;
+            final bool canPop = parentRoute?.canPop ?? false;
+
+            if (hasEndDrawer && canPop) {
+              return BackButton();
+            } else {
+              return SizedBox.shrink();
+            }
+          },
+        ),
+        title: Container(
+          height: ScreenAdapter.height(70),
+          decoration: BoxDecoration(
+            color: Color.fromRGBO(233, 233, 233, 0.8),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: TextField(
+            controller: _initKeywordsController,
+            autofocus: false,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            onChanged: (value){
+              setState(() {
+                _keywords = value;
+              });
+            },
+          ),
+        ),
+        actions: <Widget>[
+          InkWell(
+            onTap: (){
+              SearchServices.setHistoryData(_keywords);//先保存搜索词
+              _subHeaderChange(1);
+            },
+            child: Container(
+              height: ScreenAdapter.height(70),
+              width: ScreenAdapter.width(80),
+              child: Row(
+                children: <Widget>[
+                  Text('搜索'),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
       //body: Text('${widget.arguments}'),
@@ -278,11 +354,15 @@ class _ProductListPageState extends State<ProductListPage> {
           child: Text('实现筛选功能'),
         ),
       ),
-      body: Stack(
+      body: !_firstPageNoData
+      ? Stack(
         children: <Widget>[
           _productListWidget(),
           _subHeaderWidget(),
         ],
+      )
+      : Center(
+        child: Text('没有您要浏览的数据'),
       ),
     );
   }

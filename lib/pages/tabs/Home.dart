@@ -169,58 +169,65 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
         children: _bestProductData.map((v){
           String imagePath = v.pic;
           String path = Api.Host + imagePath.replaceAll('\\', '/');
-          return Container(
-            width: itemWidth,
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color.fromRGBO(233, 233, 233, 0.9),
-                width: 1,
-              ),
-            ),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  width: double.infinity,
-                  child: AspectRatio(
-                    aspectRatio: 1/1,//防止服务器图片宽高不一致
-                    child: Image.network('${path}', fit: BoxFit.cover),
-                  ),
+          return InkWell(
+            onTap: (){
+              Navigator.pushNamed(context, '/productContent', arguments: {
+                'id': v.sId,
+              });
+            },
+            child: Container(
+              width: itemWidth,
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Color.fromRGBO(233, 233, 233, 0.9),
+                  width: 1,
                 ),
-                Padding(
-                  padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
-                  child: Text(
-                    v.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,//多出部分...
-                    style: TextStyle(
-                      color: Colors.black54,
+              ),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    width: double.infinity,
+                    child: AspectRatio(
+                      aspectRatio: 1/1,//防止服务器图片宽高不一致
+                      child: Image.network('${path}', fit: BoxFit.cover),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
-                  child: Stack(
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text('￥${v.price}', style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 16,
-                        )),
+                  Padding(
+                    padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
+                    child: Text(
+                      v.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,//多出部分...
+                      style: TextStyle(
+                        color: Colors.black54,
                       ),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text('￥${v.oldPrice}', style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 14,
-                          decoration: TextDecoration.lineThrough,
-                        )),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.only(top: ScreenAdapter.height(20)),
+                    child: Stack(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text('￥${v.price}', style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 16,
+                          )),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text('￥${v.oldPrice}', style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 14,
+                            decoration: TextDecoration.lineThrough,
+                          )),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }).toList(),

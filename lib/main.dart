@@ -20,10 +20,12 @@ class _JDState extends State<JD> {
     return ScreenUtilInit(
       designSize: Size(720, 1520),//配置设计稿的宽度高度
       builder: () => MaterialApp(
-        initialRoute: '/',
+        debugShowCheckedModeBanner: false,
+        initialRoute: '/productContent',
         onGenerateRoute: onGenerateRoute,
         theme: ThemeData(
-          primarySwatch: primaryWhite,
+          //primarySwatch: primaryWhite,
+          primarySwatch: Colors.amber,
         ),
         builder: (context, widget) {
           ScreenUtil.setContext(context);
