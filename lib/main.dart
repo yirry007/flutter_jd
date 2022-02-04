@@ -21,7 +21,7 @@ class _JDState extends State<JD> {
       designSize: Size(720, 1520),//配置设计稿的宽度高度
       builder: () => MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: '/productContent',
+        initialRoute: '/',
         onGenerateRoute: onGenerateRoute,
         theme: ThemeData(
           //primarySwatch: primaryWhite,

@@ -1,10 +1,13 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_jd/pages/ProductContent/ProductContentFirst.dart';
 import 'package:flutter_jd/pages/ProductContent/ProductContentSecond.dart';
 import 'package:flutter_jd/pages/ProductContent/ProductContentThird.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
+import 'package:flutter_jd/widget/LoadingWidget.dart';
 import 'package:flutter_jd/widget/MainButton.dart';
+import 'package:flutter_jd/config/Api.dart';
+import 'package:flutter_jd/model/ProductContentModel.dart';
+import 'package:dio/dio.dart';
 
 class ProductContentPage extends StatefulWidget {
   final Map? arguments;
@@ -15,6 +18,26 @@ class ProductContentPage extends StatefulWidget {
 }
 
 class _ProductContentPageState extends State<ProductContentPage> {
+  ProductContentItem? _productContentData;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _getContentData();
+  }
+
+  _getContentData() async{
+    var api = '${Api.pcontent}?id=${widget.arguments!['id']}';
+    var result = await Dio().get(api);
+    var productContent = ProductContentModel.fromJson(result.data);
+
+    setState(() {
+      _productContentData = productContent.result;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -74,12 +97,13 @@ class _ProductContentPageState extends State<ProductContentPage> {
             ),
           ],
         ),
-        body: Stack(
+        body: _productContentData != null
+        ? Stack(
           children: <Widget>[
             TabBarView(//这个组件必须在appBar里有TabBar组件
               children: <Widget>[
-                ProductContentFirst(),
-                ProductContentSecond(),
+                ProductContentFirst(productContentData: _productContentData),
+                ProductContentSecond(productContentData: _productContentData),
                 ProductContentThird(),
               ],
             ),
@@ -136,7 +160,8 @@ class _ProductContentPageState extends State<ProductContentPage> {
               ),
             ),
           ],
-        ),
+        )
+        :LoadingWidget(),
       ),
     );
   }
