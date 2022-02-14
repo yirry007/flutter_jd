@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jd/provider/Cart.dart';
 import 'package:flutter_jd/routers/router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'colors.dart';
@@ -24,6 +25,7 @@ class _JDState extends State<JD> {
       builder: () => MultiProvider(//全局状态管理provider
         providers: [
           ChangeNotifierProvider(create: (_) => Counter()),
+          ChangeNotifierProvider(create: (_) => Cart()),
           //ChangeNotifierProvider(create: (_) => Cart()),
         ],
         child: MaterialApp(

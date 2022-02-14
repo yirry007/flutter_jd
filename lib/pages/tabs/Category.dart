@@ -168,11 +168,45 @@ class _CategoryPageState extends State<CategoryPage>
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        _leftCateWidget(),
-        _rightCateWidget(),
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.center_focus_weak),
+          onPressed: (){},
+        ),
+        title: InkWell(
+          onTap: (){
+            Navigator.pushNamed(context, '/search');
+          },
+          child: Container(
+            height: ScreenAdapter.height(70),
+            padding: EdgeInsets.only(left: 10),
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(233, 233, 233, 0.8),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(Icons.search),
+                Text('笔记本', style: TextStyle(fontSize: ScreenAdapter.size(28))),
+              ],
+            ),
+          ),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.message, size: 28, color: Colors.black87),
+            onPressed: (){},
+          ),
+        ],
+      ),
+      body: Row(
+        children: <Widget>[
+          _leftCateWidget(),
+          _rightCateWidget(),
+        ],
+      ),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'package:flutter_jd/widget/MainButton.dart';
 import 'package:flutter_jd/config/Api.dart';
 import 'package:flutter_jd/model/ProductContentModel.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_jd/services/EventBus.dart';
 
 class ProductContentPage extends StatefulWidget {
   final Map? arguments;
@@ -141,7 +142,12 @@ class _ProductContentPageState extends State<ProductContentPage> {
                         color: Color.fromRGBO(253, 1, 0, 0.9),
                         text: '加入购物车',
                         onTap: (){
-                          print('加入购物车');
+                          if (_productContentData!.attr!.isNotEmpty) {
+                            //有属性，则弹出属性筛选框
+                            eventBus.fire(ProductContentEvent(str: '加入购物车'));
+                          } else {
+                            print('加入购物车操作');
+                          }
                         },
                       ),
                     ),
@@ -151,7 +157,12 @@ class _ProductContentPageState extends State<ProductContentPage> {
                         color: Color.fromRGBO(253, 165, 0, 0.9),
                         text: '立即购买',
                         onTap: (){
-                          print('立即购买');
+                          if (_productContentData!.attr!.isNotEmpty) {
+                            //有属性，则弹出属性筛选框
+                            eventBus.fire(ProductContentEvent(str: '立即购买'));
+                          } else {
+                            print('立即购买操作');
+                          }
                         },
                       ),
                     ),

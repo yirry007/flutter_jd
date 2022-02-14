@@ -12,12 +12,11 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
-    var counterProvider = Provider.of<Counter>(context);
-
-    return Center(
-      child: Text('${counterProvider.count}', style: TextStyle(
-        fontSize: 50,
-      )),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('用户中心'),
+      ),
+      body: Text('用户中心'),
     );
   }
 }

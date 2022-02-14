@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_jd/config/Api.dart';
 import 'package:flutter_jd/model/ProductContentModel.dart';
+import 'package:flutter_jd/pages/Cart/CartNum.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
 import 'package:flutter_jd/widget/MainButton.dart';
+import 'package:flutter_jd/services/EventBus.dart';
 
 class ProductContentFirst extends StatefulWidget {
   ProductContentItem? productContentData;
@@ -12,8 +14,9 @@ class ProductContentFirst extends StatefulWidget {
   State<ProductContentFirst> createState() => _ProductContentFirstState();
 }
 
-class _ProductContentFirstState extends State<ProductContentFirst> with AutomaticKeepAliveClientMixin {
-  ProductContentItem? _productCotent;
+class _ProductContentFirstState extends State<ProductContentFirst>
+    with AutomaticKeepAliveClientMixin {
+  ProductContentItem? _productContent;
   List<Attr>? _attr = [];
   String _selectedValue = '';
 
@@ -21,19 +24,38 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 
+  var actionEventBus;
+
   @override
   void initState() {
     super.initState();
 
-    _productCotent = widget.productContentData;
+    _productContent = widget.productContentData;
     _attr = widget.productContentData?.attr;
 
     _initAttr();
+
+    // eventBus.on().listen((event){//监听所有的广播
+    //   print(event);
+    //   _attrBottomSheet();
+    // });
+
+    actionEventBus = eventBus.on<ProductContentEvent>().listen((event) {
+      print(event);
+      _attrBottomSheet();
+    });
   }
 
-  _initAttr(){
-    for (int i=0;i<_attr!.length;i++) {
-      for (int j=0;j<_attr![i].list!.length;j++) {
+  //当组件销毁时取消事件监听
+  void dispose() {
+    super.dispose();
+
+    actionEventBus.cancel();
+  }
+
+  _initAttr() {
+    for (int i = 0; i < _attr!.length; i++) {
+      for (int j = 0; j < _attr![i].list!.length; j++) {
         _attr![i].attrList!.add({
           'title': _attr![i].list![j],
           'checked': j == 0,
@@ -45,13 +67,14 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
   }
 
   //改变属性值
-  _changeAttr(cate, title, setBottomState){
+  _changeAttr(cate, title, setBottomState) {
     List<Attr>? attr = _attr;
-    for (int i=0;i<attr!.length;i++) {
+    for (int i = 0; i < attr!.length; i++) {
       if (attr[i].cate == cate) {
-        for (int j=0;j<attr[i].attrList!.length;j++) {
+        for (int j = 0; j < attr[i].attrList!.length; j++) {
           setState(() {
-            attr[i].attrList![j]['checked'] = attr[i].attrList![j]['title'] == title;
+            attr[i].attrList![j]['checked'] =
+                attr[i].attrList![j]['title'] == title;
           });
         }
       }
@@ -66,10 +89,10 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
   }
 
   //获取已选中的属性值
-  _getSelectedAttrValute(){
+  _getSelectedAttrValute() {
     List tempAttr = [];
-    for (int i=0;i<_attr!.length;i++) {
-      for (int j=0;j<_attr![i].attrList!.length;j++) {
+    for (int i = 0; i < _attr!.length; i++) {
+      for (int j = 0; j < _attr![i].attrList!.length; j++) {
         if (_attr![i].attrList![j]['checked'] == true) {
           tempAttr.add(_attr![i].attrList![j]['title']);
         }
@@ -81,10 +104,64 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
     });
   }
 
-  _attrBottomSheet(){
+  List<Widget> _getAttrItemWidget(attrItem, setBottomState) {
+    List<Widget> attrItemList = [];
+
+    attrItem.attrList.forEach((item) {
+      attrItemList.add(
+        Container(
+          margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
+          child: InkWell(
+            onTap: () {
+              _changeAttr(attrItem.cate, item['title'], setBottomState);
+            },
+            child: Chip(
+              label: Text('${item['title']}',
+                  style: TextStyle(
+                    color: item['checked'] ? Colors.white : Colors.black54,
+                  )),
+              padding: EdgeInsets.all(10),
+              backgroundColor: item['checked'] ? Colors.red : Colors.black12,
+            ),
+          ),
+        ),
+      );
+    });
+
+    return attrItemList;
+  }
+
+  List<Widget> _getAttrWidget(setBottomState) {
+    List<Widget> attrList = [];
+
+    _attr!.forEach((attrItem) {
+      attrList.add(Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            width: ScreenAdapter.width(150),
+            padding: EdgeInsets.only(top: 22),
+            alignment: Alignment.center,
+            child: Text('${attrItem.cate}： ',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          Expanded(
+            flex: 1,
+            child: Wrap(
+              children: _getAttrItemWidget(attrItem, setBottomState),
+            ),
+          ),
+        ],
+      ));
+    });
+
+    return attrList;
+  }
+
+  _attrBottomSheet() {
     showModalBottomSheet(
       context: context,
-      builder: (context){
+      builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, setBottomState) {
             return Stack(
@@ -92,48 +169,31 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
                 Container(
                   padding: EdgeInsets.all(10),
                   child: ListView(
-                    children: _attr!.map((attrItem){
-                      return Column(
-                        children: <Widget>[
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: _getAttrWidget(setBottomState),
+                      ),
+                      Divider(),
+                      Container(
+                        margin: EdgeInsets.only(top: 10),
+                        height: ScreenAdapter.height(80),
+                        child: InkWell(
+                          onTap: () {
+                            _attrBottomSheet();
+                          },
+                          child: Row(
                             children: <Widget>[
-                              Container(
-                                width: ScreenAdapter.width(150),
-                                padding: EdgeInsets.only(top: 22),
-                                alignment: Alignment.center,
-                                child: Text('${attrItem.cate}： ', style: TextStyle(
-                                  fontWeight: FontWeight.bold
-                                )),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Wrap(
-                                  children: attrItem.attrList!.map((item){
-                                    return Container(
-                                      margin: EdgeInsets.fromLTRB(8, 4, 8, 4),
-                                      child: InkWell(
-                                        onTap: (){
-                                          _changeAttr(attrItem.cate, item['title'], setBottomState);
-                                        },
-                                        child: Chip(
-                                          label: Text('${item['title']}', style: TextStyle(
-                                            color: item['checked'] ? Colors.white : Colors.black54,
-                                          )),
-                                          padding: EdgeInsets.all(10),
-                                          backgroundColor: item['checked'] ? Colors.red : Colors.black12,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ),
+                              Text('数量',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              SizedBox(width: 10),
+                              CartNum(),
                             ],
                           ),
-                          SizedBox(height: 10),
-                        ],
-                      );
-                    }).toList(),
+                        ),
+                      )
+                    ],
                   ),
                 ),
                 Positioned(
@@ -149,7 +209,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
                           child: MainButton(
                             color: Color.fromRGBO(253, 1, 0, 0.9),
                             text: '加入购物车',
-                            onTap: (){
+                            onTap: () {
                               print('加入购物车');
                             },
                           ),
@@ -162,7 +222,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
                           child: MainButton(
                             color: Color.fromRGBO(253, 165, 0, 0.9),
                             text: '立即购买',
-                            onTap: (){
+                            onTap: () {
                               print('立即购买');
                             },
                           ),
@@ -181,7 +241,7 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
 
   @override
   Widget build(BuildContext context) {
-    String? imagePath = _productCotent?.pic;
+    String? imagePath = _productContent?.pic;
     String path = Api.Host + imagePath!.replaceAll('\\', '/');
 
     return Container(
@@ -189,22 +249,24 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
       child: ListView(
         children: <Widget>[
           AspectRatio(
-            aspectRatio: 1/1,
+            aspectRatio: 1 / 1,
             child: Image.network('${path}', fit: BoxFit.cover),
           ),
           Container(
             padding: EdgeInsets.only(top: 10),
-            child: Text('${_productCotent?.title}', style: TextStyle(
-              color: Colors.black87,
-              fontSize: ScreenAdapter.size(36),
-            )),
+            child: Text('${_productContent?.title}',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: ScreenAdapter.size(36),
+                )),
           ),
           Container(
             padding: EdgeInsets.only(top: 10),
-            child: Text('${_productCotent?.subTitle}', style: TextStyle(
-              color: Colors.black54,
-              fontSize: ScreenAdapter.size(28),
-            )),
+            child: Text('${_productContent?.subTitle}',
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: ScreenAdapter.size(28),
+                )),
           ),
           Container(
             padding: EdgeInsets.only(top: 10),
@@ -214,20 +276,22 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
                 Row(
                   children: <Widget>[
                     Text('特价:'),
-                    Text('￥${_productCotent?.price}', style: TextStyle(
-                      color: Colors.red,
-                      fontSize: ScreenAdapter.size(48),
-                    )),
+                    Text('￥${_productContent?.price}',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: ScreenAdapter.size(48),
+                        )),
                   ],
                 ),
                 Row(
                   children: <Widget>[
                     Text('原价:'),
-                    Text('￥${_productCotent?.oldPrice}',style: TextStyle(
-                      color: Colors.black38,
-                      fontSize: ScreenAdapter.size(28),
-                      decoration: TextDecoration.lineThrough,
-                    )),
+                    Text('￥${_productContent?.oldPrice}',
+                        style: TextStyle(
+                          color: Colors.black38,
+                          fontSize: ScreenAdapter.size(28),
+                          decoration: TextDecoration.lineThrough,
+                        )),
                   ],
                 ),
               ],
@@ -235,22 +299,23 @@ class _ProductContentFirstState extends State<ProductContentFirst> with Automati
           ),
           SizedBox(height: 20),
           _attr!.length > 0
-          ? Container(
-            height: ScreenAdapter.height(80),
-            child: InkWell(
-              onTap: (){
-                _attrBottomSheet();
-              },
-              child: Row(
-                children: <Widget>[
-                  Text('已选', style: TextStyle(fontWeight: FontWeight.bold)),
-                  SizedBox(width: 10),
-                  Text('${_selectedValue}'),
-                ],
-              ),
-            ),
-          )
-          : Text(''),
+              ? Container(
+                  height: ScreenAdapter.height(80),
+                  child: InkWell(
+                    onTap: () {
+                      _attrBottomSheet();
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        Text('已选',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        SizedBox(width: 10),
+                        Text('${_selectedValue}'),
+                      ],
+                    ),
+                  ),
+                )
+              : Text(''),
           Divider(),
           Container(
             height: ScreenAdapter.height(80),

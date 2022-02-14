@@ -237,20 +237,54 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        _swiperWidget(),
-        
-        SizedBox(height: ScreenAdapter.height(20)),
-        _titleWidget('猜你喜欢'),
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.center_focus_weak),
+          onPressed: (){},
+        ),
+        title: InkWell(
+          onTap: (){
+            Navigator.pushNamed(context, '/search');
+          },
+          child: Container(
+            height: ScreenAdapter.height(70),
+            padding: EdgeInsets.only(left: 10),
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(233, 233, 233, 0.8),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(Icons.search),
+                Text('笔记本', style: TextStyle(fontSize: ScreenAdapter.size(28))),
+              ],
+            ),
+          ),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.message, size: 28, color: Colors.black87),
+            onPressed: (){},
+          ),
+        ],
+      ),
+      body: ListView(
+        children: <Widget>[
+          _swiperWidget(),
+          
+          SizedBox(height: ScreenAdapter.height(20)),
+          _titleWidget('猜你喜欢'),
 
-        SizedBox(height: ScreenAdapter.height(20)),
-        _hotProductListWidget(),
+          SizedBox(height: ScreenAdapter.height(20)),
+          _hotProductListWidget(),
 
-        _titleWidget('热门推荐'),
+          _titleWidget('热门推荐'),
 
-        _recProductListWidget(),
-      ],
+          _recProductListWidget(),
+        ],
+      ),
     );
   }
 }

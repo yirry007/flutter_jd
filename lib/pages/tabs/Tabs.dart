@@ -32,40 +32,6 @@ class _TabsState extends State<Tabs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _currentIndex != 3
-        ?AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.center_focus_weak),
-            onPressed: (){},
-          ),
-          title: InkWell(
-            onTap: (){
-              Navigator.pushNamed(context, '/search');
-            },
-            child: Container(
-              height: ScreenAdapter.height(70),
-              padding: EdgeInsets.only(left: 10),
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(233, 233, 233, 0.8),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Icon(Icons.search),
-                  Text('笔记本', style: TextStyle(fontSize: ScreenAdapter.size(28))),
-                ],
-              ),
-            ),
-          ),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.message, size: 28, color: Colors.black87),
-              onPressed: (){},
-            ),
-          ],
-        )
-        :AppBar(title: Text('用户中心')),
         /*
         body: IndexedStack(//这个组件可以保持页面的数据状态（适用于所有页面保持状态）
           index: this._currentIndex,//根据这个索引判断显示第几个页面
