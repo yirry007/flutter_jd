@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_jd/provider/Counter.dart';
 
 class UserPage extends StatefulWidget {
   UserPage({Key? key}) : super(key: key);

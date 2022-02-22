@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jd/config/Api.dart';
 import 'package:flutter_jd/pages/Cart/CartNum.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_jd/provider/Cart.dart';
 
 class CartItem extends StatefulWidget {
-  CartItem({Key? key}) : super(key: key);
+  Map? _itemData;
+  CartItem(this._itemData, {Key? key}) : super(key: key);
 
   @override
   State<CartItem> createState() => _CartItemState();
 }
 
 class _CartItemState extends State<CartItem> {
+  Map? _itemData;
+
   @override
   Widget build(BuildContext context) {
+    _itemData = widget._itemData;//provider本身只重新build，不能initState，因此_itemData 必须设置在build里才能获取实时数据
+    
+    String imagePath = _itemData!['pic'];
+    String path = Api.Host + imagePath.replaceAll('\\', '/');
+    var cartProvider = Provider.of<Cart>(context);
     return Container(
       height: ScreenAdapter.height(200),
       padding: EdgeInsets.all(5),
@@ -28,13 +39,17 @@ class _CartItemState extends State<CartItem> {
           Container(
             width: ScreenAdapter.width(60),
             child: Checkbox(
-              value: true,
-              onChanged: (val){},
+              value: _itemData!['checked'],
+              onChanged: (val){
+                _itemData!['checked'] = !_itemData!['checked'];
+                cartProvider.itemChange();
+              },
               activeColor: Colors.amber,
             ),
-          ),Container(
+          ),
+          Container(
             width: ScreenAdapter.width(160),
-            child: Image.network('https://www.itying.com/images/flutter/list2.jpg', fit: BoxFit.cover),
+            child: Image.network('${path}', fit: BoxFit.cover),
           ),
           Expanded(
             flex: 1,
@@ -42,15 +57,22 @@ class _CartItemState extends State<CartItem> {
               padding: EdgeInsets.all(10),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('【二手95新】Apple MacBook Air Pro 二手苹果笔记本电脑 办公 游戏 设计 剪辑 12款13.3英寸231-4G/128G', maxLines: 2,),
+                  Text('${_itemData!['title']}', maxLines: 2, style: TextStyle(
+                    fontSize: ScreenAdapter.size(24),
+                  )),
+                  Text('${_itemData!['selectedAttr']}', style: TextStyle(
+                    fontSize: ScreenAdapter.size(18),
+                    color: Colors.black54,
+                  )),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('￥20', style: TextStyle(
+                      Text('￥${_itemData!['price']}', style: TextStyle(
                         color: Colors.red,
                       )),
-                      CartNum(),
+                      CartNum(_itemData),
                     ],
                   ),
                 ],

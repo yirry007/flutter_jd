@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_jd/provider/Cart.dart';
+import 'package:flutter_jd/model/ProductContentModel.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
 
 class CartNum extends StatefulWidget {
-  Map? _itemData;
-  CartNum(this._itemData, {Key? key}) : super(key: key);
+  ProductContentItem _productContent;
+
+  CartNum(this._productContent, {Key? key}) : super(key: key);
 
   @override
   State<CartNum> createState() => _CartNumState();
 }
 
 class _CartNumState extends State<CartNum> {
-  Map? _itemData;
-  var cartProvider;
+  ProductContentItem? _productContent;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _productContent = widget._productContent;
+  }
 
   @override
   Widget build(BuildContext context) {
-    _itemData = widget._itemData;//provider本身只重新build，不能initState，因此_itemData 必须设置在build里才能获取实时数据
-    cartProvider = Provider.of<Cart>(context);
-
     return Container(
       width: ScreenAdapter.width(164),
       decoration: BoxDecoration(
@@ -42,9 +46,10 @@ class _CartNumState extends State<CartNum> {
   Widget _leftBtn(){
     return InkWell(
       onTap: (){
-        if (_itemData!['count'] > 1) {
-          _itemData!['count']--;
-          cartProvider.itemCountChange();
+        if (_productContent!.count! > 1) {
+          setState(() {
+            _productContent!.count = _productContent!.count! - 1;
+          });
         }
       },
       child: Container(
@@ -60,8 +65,9 @@ class _CartNumState extends State<CartNum> {
   Widget _rightBtn(){
     return InkWell(
       onTap: (){
-        _itemData!['count']++;
-        cartProvider.itemCountChange();
+        setState(() {
+          _productContent!.count = _productContent!.count! + 1;
+        });
       },
       child: Container(
         alignment: Alignment.center,
@@ -91,7 +97,7 @@ class _CartNumState extends State<CartNum> {
           ),
         ),
       ),
-      child: Text('${widget._itemData!['count']}'),
+      child: Text('${_productContent!.count}'),
     );
   }
 }

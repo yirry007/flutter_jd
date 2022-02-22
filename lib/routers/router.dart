@@ -3,10 +3,12 @@ import 'package:flutter_jd/pages/Search.dart';
 import 'package:flutter_jd/pages/tabs/Tabs.dart';
 import 'package:flutter_jd/pages/ProductList.dart';
 import 'package:flutter_jd/pages/ProductContent.dart';
+import 'package:flutter_jd/pages/tabs/Cart.dart';
 
 final routes = {
   '/': (context)=>Tabs(),
   '/search': (context)=>SearchPage(),
+  '/cart': (context)=>CartPage(),
   '/productList': (context, {arguments})=>ProductListPage(arguments: arguments),
   '/productContent': (context, {arguments})=>ProductContentPage(arguments: arguments),
 };

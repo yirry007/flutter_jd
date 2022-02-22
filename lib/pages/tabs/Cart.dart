@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_jd/pages/Cart/CartItem.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_jd/provider/Counter.dart';
 import 'package:flutter_jd/provider/Cart.dart';
 
 class CartPage extends StatefulWidget {
@@ -13,26 +12,37 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
+  bool _isEdit = false;
+
   @override
   Widget build(BuildContext context) {
+    var cartProvider = Provider.of<Cart>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('购物车'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.launch),
-            onPressed: (){},
+            onPressed: (){
+              setState(() {
+                _isEdit = !_isEdit;
+              });
+            },
           ),
         ],
       ),
-      body: Stack(
+      body: cartProvider.cartList.length > 0
+      ?Stack(
         children: <Widget>[
           ListView(
             children: <Widget>[
-              CartItem(),
-              CartItem(),
-              CartItem(),
-              CartItem(),
+              Column(
+                children: cartProvider.cartList.map((value){
+                  return CartItem(value);
+                }).toList(),
+              ),
+              SizedBox(height: ScreenAdapter.height(100)),
             ],
           ),
           Positioned(
@@ -59,20 +69,42 @@ class _CartPageState extends State<CartPage> {
                       Container(
                         width: ScreenAdapter.width(60),
                         child: Checkbox(
-                          value: true,
+                          value: cartProvider.isCheckedAll,
                           activeColor: Colors.amber,
-                          onChanged: (val){},
+                          onChanged: (val){
+                            cartProvider.checkAll(val);
+                          },
                         ),
                       ),
                       Text('全选'),
+                      SizedBox(width: 20),
+                      _isEdit == false ? Text('合计： ') : Text(''),
+                      _isEdit == false
+                      ?Text('${cartProvider.allPrice}', style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.red,
+                      ))
+                      :Text(''),
                     ],
                   ),
                   
-                  ElevatedButton(
+                  !_isEdit
+                  ? ElevatedButton(
                     child: Text('结算', style: TextStyle(
                       color: Colors.white,
                     )),
                     onPressed: (){},
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.red,
+                    ),
+                  )
+                  : ElevatedButton(
+                    child: Text('删除', style: TextStyle(
+                      color: Colors.white,
+                    )),
+                    onPressed: (){
+                      cartProvider.removeItem();
+                    },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.red,
                     ),
@@ -82,6 +114,9 @@ class _CartPageState extends State<CartPage> {
             ),
           ),
         ],
+      )
+      :Center(
+        child: Text('购物车空空的...'),
       ),
     );
   }

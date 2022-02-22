@@ -4,7 +4,6 @@ import 'package:flutter_jd/routers/router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'colors.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_jd/provider/Counter.dart';
 
 void main() {
   runApp(JD());
@@ -23,10 +22,9 @@ class _JDState extends State<JD> {
     return ScreenUtilInit(
       designSize: Size(720, 1520),//配置设计稿的宽度高度
       builder: () => MultiProvider(//全局状态管理provider
-        providers: [
-          ChangeNotifierProvider(create: (_) => Counter()),
+        providers: [//只是重新build，不执行initState
+          //ChangeNotifierProvider(create: (_) => Counter()),
           ChangeNotifierProvider(create: (_) => Cart()),
-          //ChangeNotifierProvider(create: (_) => Cart()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,

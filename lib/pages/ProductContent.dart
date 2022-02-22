@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_jd/pages/ProductContent/ProductContentFirst.dart';
 import 'package:flutter_jd/pages/ProductContent/ProductContentSecond.dart';
 import 'package:flutter_jd/pages/ProductContent/ProductContentThird.dart';
+import 'package:flutter_jd/provider/Cart.dart';
+import 'package:flutter_jd/services/CartServices.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
 import 'package:flutter_jd/widget/LoadingWidget.dart';
 import 'package:flutter_jd/widget/MainButton.dart';
@@ -9,6 +11,8 @@ import 'package:flutter_jd/config/Api.dart';
 import 'package:flutter_jd/model/ProductContentModel.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_jd/services/EventBus.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 
 class ProductContentPage extends StatefulWidget {
   final Map? arguments;
@@ -41,6 +45,8 @@ class _ProductContentPageState extends State<ProductContentPage> {
 
   @override
   Widget build(BuildContext context) {
+    var cartProvider = Provider.of<Cart>(context);
+    
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -125,15 +131,20 @@ class _ProductContentPageState extends State<ProductContentPage> {
                 ),
                 child: Row(
                   children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.only(top: ScreenAdapter.height(10)),
-                      width: 80,
-                      height: ScreenAdapter.height(100),
-                      child: Column(
-                        children: <Widget>[
-                          Icon(Icons.shopping_cart),
-                          Text('购物车'),
-                        ],
+                    InkWell(
+                      onTap: (){
+                        Navigator.pushNamed(context, '/cart');
+                      },
+                      child: Container(
+                        padding: EdgeInsets.only(top: ScreenAdapter.height(10)),
+                        width: 80,
+                        height: ScreenAdapter.height(100),
+                        child: Column(
+                          children: <Widget>[
+                            Icon(Icons.shopping_cart),
+                            Text('购物车'),
+                          ],
+                        ),
                       ),
                     ),
                     Expanded(
@@ -141,12 +152,21 @@ class _ProductContentPageState extends State<ProductContentPage> {
                       child: MainButton(
                         color: Color.fromRGBO(253, 1, 0, 0.9),
                         text: '加入购物车',
-                        onTap: (){
+                        onTap: () async {
                           if (_productContentData!.attr!.isNotEmpty) {
                             //有属性，则弹出属性筛选框
                             eventBus.fire(ProductContentEvent(str: '加入购物车'));
                           } else {
-                            print('加入购物车操作');
+                            //把数据放入购物车中
+                            await CartServices.addCart(_productContentData);
+                            //调用Provider 更新数据
+                            cartProvider.updateCartList();
+
+                            Fluttertoast.showToast(
+                              msg: "加入购物车成功",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.CENTER,
+                            );
                           }
                         },
                       ),

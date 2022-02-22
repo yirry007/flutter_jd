@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_jd/config/Api.dart';
 import 'package:flutter_jd/model/ProductContentModel.dart';
-import 'package:flutter_jd/pages/Cart/CartNum.dart';
+import 'package:flutter_jd/pages/ProductContent/CartNum.dart';
+import 'package:flutter_jd/services/CartServices.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
 import 'package:flutter_jd/widget/MainButton.dart';
 import 'package:flutter_jd/services/EventBus.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_jd/provider/Cart.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ProductContentFirst extends StatefulWidget {
   ProductContentItem? productContentData;
@@ -101,6 +105,7 @@ class _ProductContentFirstState extends State<ProductContentFirst>
     //print(tempAttr.join(','));
     setState(() {
       _selectedValue = tempAttr.join(',');
+      _productContent!.selectedAttr = _selectedValue;
     });
   }
 
@@ -164,6 +169,7 @@ class _ProductContentFirstState extends State<ProductContentFirst>
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, setBottomState) {
+            var cartProvider = Provider.of<Cart>(context);
             return Stack(
               children: <Widget>[
                 Container(
@@ -178,21 +184,15 @@ class _ProductContentFirstState extends State<ProductContentFirst>
                       Container(
                         margin: EdgeInsets.only(top: 10),
                         height: ScreenAdapter.height(80),
-                        child: InkWell(
-                          onTap: () {
-                            _attrBottomSheet();
-                          },
-                          child: Row(
-                            children: <Widget>[
-                              Text('数量',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(width: 10),
-                              CartNum(),
-                            ],
-                          ),
+                        child: Row(
+                          children: <Widget>[
+                            Text('数量',
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            SizedBox(width: 10),
+                            CartNum(_productContent!),
+                          ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -209,8 +209,19 @@ class _ProductContentFirstState extends State<ProductContentFirst>
                           child: MainButton(
                             color: Color.fromRGBO(253, 1, 0, 0.9),
                             text: '加入购物车',
-                            onTap: () {
-                              print('加入购物车');
+                            onTap: () async {
+                              //把数据放入购物车中
+                              await CartServices.addCart(_productContent);
+                              //关闭属性弹窗
+                              Navigator.of(context).pop();
+                              //调用Provider 更新数据
+                              cartProvider.updateCartList();
+
+                              Fluttertoast.showToast(
+                                msg: "加入购物车成功",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                              );
                             },
                           ),
                         ),
