@@ -108,6 +108,7 @@ class _ProductContentPageState extends State<ProductContentPage> {
         ? Stack(
           children: <Widget>[
             TabBarView(//这个组件必须在appBar里有TabBar组件
+              physics: NeverScrollableScrollPhysics(),//禁止页面触摸滑动
               children: <Widget>[
                 ProductContentFirst(productContentData: _productContentData),
                 ProductContentSecond(productContentData: _productContentData),

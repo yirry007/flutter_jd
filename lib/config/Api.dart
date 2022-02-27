@@ -5,4 +5,6 @@ class Api{
   static String plist = '${Api.Host}api/plist';
   static String pcate = '${Api.Host}api/pcate';
   static String pcontent = '${Api.Host}api/pcontent';
+  static String sendCode = '${Api.Host}api/sendCode';
+  static String validateCode = '${Api.Host}api/validateCode';
 }
