@@ -14,6 +14,12 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   bool _isEdit = false;
 
+  doCheckOut(){
+    //判断用户有没有登录
+
+    Navigator.pushNamed(context, '/checkout');
+  }
+
   @override
   Widget build(BuildContext context) {
     var cartProvider = Provider.of<Cart>(context);
@@ -93,7 +99,7 @@ class _CartPageState extends State<CartPage> {
                     child: Text('结算', style: TextStyle(
                       color: Colors.white,
                     )),
-                    onPressed: (){},
+                    onPressed: doCheckOut,
                     style: ElevatedButton.styleFrom(
                       primary: Colors.red,
                     ),

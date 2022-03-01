@@ -28,7 +28,7 @@ class _JDState extends State<JD> {
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          initialRoute: '/register_first',
+          initialRoute: '/checkout',
           onGenerateRoute: onGenerateRoute,
           theme: ThemeData(
             //primarySwatch: primaryWhite,

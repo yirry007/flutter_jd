@@ -74,7 +74,10 @@ class _RegisterSecondPageState extends State<RegisterSecondPage> {
   //验证验证码
   validateCode() async{
     var api =  Api.validateCode;
-    var response = await Dio().post(api, data: {"tel": tel, "code": code});
+    var response = await Dio().post(api, data: {
+      "tel": tel,
+      "code": code
+    });
 
     if (!response.data['success']) {
       Fluttertoast.showToast(
@@ -85,7 +88,10 @@ class _RegisterSecondPageState extends State<RegisterSecondPage> {
       return false;
     }
 
-    Navigator.pushNamed(context, '/register_third');
+    Navigator.pushNamed(context, '/register_third', arguments: {
+      "tel": tel,
+      "code": code,
+    });
   }
 
   @override

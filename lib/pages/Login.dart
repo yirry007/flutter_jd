@@ -1,7 +1,14 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_jd/config/Api.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
+import 'package:flutter_jd/services/Storage.dart';
 import 'package:flutter_jd/widget/JDText.dart';
 import 'package:flutter_jd/widget/MainButton.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_jd/services/EventBus.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key? key}) : super(key: key);
@@ -11,6 +18,58 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  //监听登录页面销毁事件
+  dispose(){
+    super.dispose();
+    eventBus.fire(UserEvent(str: '登录成功'));
+  }
+
+  String username = '';
+  String password = '';
+
+  doLogin() async{
+    RegExp reg = RegExp(r'^1\d{10}$');
+
+    if (!reg.hasMatch(username)) {
+      Fluttertoast.showToast(
+        msg: "手机号格式错误",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+      );
+      return false;
+    }
+    
+    if (password.length < 6) {
+      Fluttertoast.showToast(
+        msg: "请输入不少于6位的密码",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+      );
+      return false;
+    }
+
+    var api = Api.doLogin;
+    var response = await Dio().post(api, data: {
+      "username": username,
+      "password": password,
+    });
+
+    if (!response.data['success']) {
+      Fluttertoast.showToast(
+        msg: "${response.data['message']}",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+      );
+      return false;
+    }
+
+    print(response);
+
+    Storage.setString('userInfo', json.encode(response.data['userinfo']));
+
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
             JDText(
               text: '请输入用户名',
               onChange: (value){
-                print(value);
+                username = value;
               }
             ),
 
@@ -58,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
               text: '请输入密码',
               password: true,
               onChange: (value){
-                print(value);
+                password = value;
               }
             ),
 
@@ -83,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
             MainButton(
               text: '登录',
               color: Colors.amber,
-              onTap: (){},
+              onTap: doLogin,
             ),
           ],
         ),

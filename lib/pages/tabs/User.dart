@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jd/services/EventBus.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_jd/services/UserServices.dart';
 
 class UserPage extends StatefulWidget {
   UserPage({Key? key}) : super(key: key);
@@ -10,6 +11,40 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
+  bool _isLogin = false;
+  List _userInfo = [];
+  var actionEventBus;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _getUserInfo();
+
+    actionEventBus = eventBus.on<UserEvent>().listen((event) {
+      print(event);
+      _getUserInfo();
+    });
+  }
+
+  //当组件销毁时取消事件监听
+  void dispose() {
+    super.dispose();
+
+    actionEventBus.cancel();
+  }
+
+  _getUserInfo() async{
+    bool isLogin = await UserServices.getUserState();
+    List userInfo = await UserServices.getUserInfo();
+
+    setState(() {
+      _isLogin = isLogin;
+      _userInfo = userInfo;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +75,25 @@ class _UserPageState extends State<UserPage> {
                     )
                   ),
                 ),
-                Expanded(
+                _isLogin
+                ?Expanded(
+                  flex: 1,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('用户名： ${_userInfo[0]['username']}', style: TextStyle(
+                        color: Colors.white,
+                        fontSize: ScreenAdapter.size(32),
+                      )),
+                      Text('普通会员', style: TextStyle(
+                        color: Colors.white,
+                        fontSize: ScreenAdapter.size(24),
+                      )),
+                    ],
+                  ),
+                )
+                :Expanded(
                   flex: 1,
                   child: InkWell(
                     onTap: (){
@@ -51,23 +104,6 @@ class _UserPageState extends State<UserPage> {
                     )),
                   ),
                 ),
-                // Expanded(
-                //   flex: 1,
-                //   child: Column(
-                //     mainAxisAlignment: MainAxisAlignment.center,
-                //     crossAxisAlignment: CrossAxisAlignment.start,
-                //     children: <Widget>[
-                //       Text('用户名： 1234567890', style: TextStyle(
-                //         color: Colors.white,
-                //         fontSize: ScreenAdapter.size(32),
-                //       )),
-                //       Text('普通会员', style: TextStyle(
-                //         color: Colors.white,
-                //         fontSize: ScreenAdapter.size(24),
-                //       )),
-                //     ],
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -101,7 +137,26 @@ class _UserPageState extends State<UserPage> {
             leading: Icon(Icons.people, color: Colors.black54),
             title: Text('在线客服'),
           ),
-          Divider(),
+          
+          _isLogin
+          ?Container(
+            width: double.infinity,
+            height: 10,
+            color: Color.fromRGBO(242, 242, 242, 0.9),
+          )
+          :Divider(),
+
+          _isLogin
+          ?ListTile(
+            leading: Icon(Icons.logout, color: Colors.brown),
+            title: Text('退出登录'),
+            onTap: (){
+              UserServices.logout();
+              _getUserInfo();
+            },
+          )
+          :Text(''),
+          _isLogin ? Divider() : Text(''),
         ],
       ),
     );

@@ -7,3 +7,9 @@ class ProductContentEvent{
 
   ProductContentEvent({this.str});
 }
+
+class UserEvent{
+  String? str;
+
+  UserEvent({this.str});
+}

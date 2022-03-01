@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jd/pages/CheckOut.dart';
 import 'package:flutter_jd/pages/Login.dart';
 import 'package:flutter_jd/pages/RegisterFirst.dart';
 import 'package:flutter_jd/pages/RegisterSecond.dart';
@@ -18,7 +19,8 @@ final routes = {
   '/login': (context)=>LoginPage(),
   '/register_first': (context)=>RegisterFirstPage(),
   '/register_second': (context, {arguments})=>RegisterSecondPage(arguments: arguments),
-  '/register_third': (context)=>RegisterThirdPage(),
+  '/register_third': (context, {arguments})=>RegisterThirdPage(arguments: arguments),
+  '/checkout': (context)=>CheckOutPage(),
 };
 
 // ignore: prefer_function_declarations_over_variables

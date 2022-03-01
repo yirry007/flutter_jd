@@ -7,4 +7,6 @@ class Api{
   static String pcontent = '${Api.Host}api/pcontent';
   static String sendCode = '${Api.Host}api/sendCode';
   static String validateCode = '${Api.Host}api/validateCode';
+  static String register = '${Api.Host}api/register';
+  static String doLogin = '${Api.Host}api/doLogin';
 }

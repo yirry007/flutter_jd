@@ -14,12 +14,12 @@ class RegisterFirstPage extends StatefulWidget {
 }
 
 class _RegisterFirstPageState extends State<RegisterFirstPage> {
-  String? tel;
+  String tel = '';
 
   _sendCode() async{
     RegExp reg = RegExp(r'^1\d{10}$');
 
-    if (!reg.hasMatch(tel!)) {
+    if (!reg.hasMatch(tel)) {
       Fluttertoast.showToast(
         msg: "手机号格式错误",
         toastLength: Toast.LENGTH_SHORT,
