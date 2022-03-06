@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jd/config/Api.dart';
+import 'package:flutter_jd/provider/CheckOut.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
+import 'package:provider/provider.dart';
 
 class CheckOutPage extends StatefulWidget {
   CheckOutPage({Key? key}) : super(key: key);
@@ -9,13 +12,16 @@ class CheckOutPage extends StatefulWidget {
 }
 
 class _CheckOutPageState extends State<CheckOutPage> {
-  Widget _checkOutItem(){
+  var checkOutPrivider;
+
+  Widget _checkOutItem(item){
+    String imagePath = item['pic'];
+    String path = Api.Host + imagePath.replaceAll('\\', '/');
     return Row(
-      
       children: <Widget>[
         Container(
           width: ScreenAdapter.width(160),
-          child: Image.network('https://www.itying.com/images/flutter/list2.jpg', fit: BoxFit.cover),
+          child: Image.network('${path}', fit: BoxFit.cover),
         ),
         Expanded(
           flex: 1,
@@ -25,20 +31,20 @@ class _CheckOutPageState extends State<CheckOutPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Flutter 仿京东商城项目实战视频教程', maxLines: 2, style: TextStyle(
+                Text('${item['title']}', maxLines: 2, style: TextStyle(
                   fontSize: ScreenAdapter.size(24),
                 )),
-                Text('白色,175', style: TextStyle(
+                Text('${item['selectedAttr']}', style: TextStyle(
                   fontSize: ScreenAdapter.size(18),
                   color: Colors.black54,
                 )),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text('￥111', style: TextStyle(
+                    Text('￥${item['price']}', style: TextStyle(
                       color: Colors.red,
                     )),
-                    Text('x2'),
+                    Text('x${item['count']}'),
                   ],
                 ),
               ],
@@ -51,6 +57,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
 
   @override
   Widget build(BuildContext context) {
+    checkOutPrivider = Provider.of<CheckOut>(context);
+    
     return Scaffold(
       appBar: AppBar(
         title: Text('结算'),
@@ -63,27 +71,30 @@ class _CheckOutPageState extends State<CheckOutPage> {
                 color: Colors.white,
                 child: Column(
                   children: <Widget>[
+                    ListTile(
+                      leading: Icon(Icons.add_location),
+                      title: Center(
+                        child: Text('请添加收货地址'),
+                      ),
+                      trailing: Icon(Icons.navigate_next),
+                      onTap: (){
+                        Navigator.pushNamed(context, '/address_list');
+                      },
+                    ),
+
+                    // SizedBox(height: 10),
                     // ListTile(
-                    //   leading: Icon(Icons.add_location),
-                    //   title: Center(
-                    //     child: Text('请添加收货地址'),
+                    //   title: Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: <Widget>[
+                    //       Text('张三 15023948023'),
+                    //       SizedBox(height: 10),
+                    //       Text('吉林省延吉市北山街xxxxxxxxxx'),
+                    //     ],
                     //   ),
                     //   trailing: Icon(Icons.navigate_next),
                     // ),
-
-                    SizedBox(height: 10),
-                    ListTile(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text('张三 15023948023'),
-                          SizedBox(height: 10),
-                          Text('吉林省延吉市北山街xxxxxxxxxx'),
-                        ],
-                      ),
-                      trailing: Icon(Icons.navigate_next),
-                    ),
-                    SizedBox(height: 10),
+                    // SizedBox(height: 10),
                   ],
                 ),
               ),
@@ -93,16 +104,14 @@ class _CheckOutPageState extends State<CheckOutPage> {
                 color: Colors.white,
                 padding: EdgeInsets.all(ScreenAdapter.width(20)),
                 child: Column(
-                  children: <Widget>[
-                    _checkOutItem(),
-                    Divider(),
-                    _checkOutItem(),
-                    Divider(),
-                    _checkOutItem(),
-                    Divider(),
-                    _checkOutItem(),
-                    Divider(),
-                  ],
+                  children: checkOutPrivider.checkOutList.map<Widget>((value){
+                    return Column(
+                      children: <Widget>[
+                        _checkOutItem(value),
+                        Divider(),
+                      ],
+                    );
+                  }).toList(),
                 ),
               ),
 
@@ -118,6 +127,7 @@ class _CheckOutPageState extends State<CheckOutPage> {
                     Text('立减: ￥5'),
                     Divider(),
                     Text('运费: 0'),
+                    SizedBox(height: ScreenAdapter.height(100)),
                   ],
                 )
               ),

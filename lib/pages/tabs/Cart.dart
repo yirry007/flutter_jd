@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_jd/pages/Cart/CartItem.dart';
+import 'package:flutter_jd/provider/CheckOut.dart';
+import 'package:flutter_jd/services/CartServices.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
+import 'package:flutter_jd/services/UserServices.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_jd/provider/Cart.dart';
 
@@ -13,9 +17,35 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   bool _isEdit = false;
+  var checkOutPrivider;
 
-  doCheckOut(){
+  doCheckOut() async{
+    //获取购物车中选中的数据
+    List checkOutData = await CartServices.getCheckOutData();
+
+    if (checkOutData.length == 0) {
+      Fluttertoast.showToast(
+        msg: "请勾选购物车商品",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+      );
+      return false;
+    }
+
+    //保存购物车选中的数据
+    checkOutPrivider.changeCheckOutListData(checkOutData);
+
     //判断用户有没有登录
+    var loginState = await UserServices.getUserState();
+    if (!loginState) {
+      Fluttertoast.showToast(
+        msg: "请登录",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+      );
+      Navigator.pushNamed(context, '/login');
+      return false;
+    }
 
     Navigator.pushNamed(context, '/checkout');
   }
@@ -23,6 +53,7 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     var cartProvider = Provider.of<Cart>(context);
+    checkOutPrivider = Provider.of<CheckOut>(context);
 
     return Scaffold(
       appBar: AppBar(

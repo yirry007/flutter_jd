@@ -43,4 +43,24 @@ class CartServices{
 
     return data;
   }
+
+  //获取购物车选中的数据
+  static getCheckOutData() async{
+    List _cartList = [];
+    List tmpList = [];
+
+    String? cartListData = await Storage.getString('cartList');
+
+    if (cartListData != null) {
+      _cartList = json.decode(cartListData);
+    }
+
+    for (int i=0;i<_cartList.length;i++) {
+      if (_cartList[i]['checked']) {
+        tmpList.add(_cartList[i]);
+      }
+    }
+
+    return tmpList;
+  }
 }

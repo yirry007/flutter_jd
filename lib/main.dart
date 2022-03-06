@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_jd/provider/Cart.dart';
+import 'package:flutter_jd/provider/CheckOut.dart';
 import 'package:flutter_jd/routers/router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'colors.dart';
@@ -25,10 +26,11 @@ class _JDState extends State<JD> {
         providers: [//只是重新build，不执行initState
           //ChangeNotifierProvider(create: (_) => Counter()),
           ChangeNotifierProvider(create: (_) => Cart()),
+          ChangeNotifierProvider(create: (_) => CheckOut()),
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          initialRoute: '/checkout',
+          initialRoute: '/',
           onGenerateRoute: onGenerateRoute,
           theme: ThemeData(
             //primarySwatch: primaryWhite,

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jd/pages/Address/AddressAdd.dart';
+import 'package:flutter_jd/pages/Address/AddressEdit.dart';
+import 'package:flutter_jd/pages/Address/AddressList.dart';
 import 'package:flutter_jd/pages/CheckOut.dart';
 import 'package:flutter_jd/pages/Login.dart';
 import 'package:flutter_jd/pages/RegisterFirst.dart';
@@ -21,6 +24,9 @@ final routes = {
   '/register_second': (context, {arguments})=>RegisterSecondPage(arguments: arguments),
   '/register_third': (context, {arguments})=>RegisterThirdPage(arguments: arguments),
   '/checkout': (context)=>CheckOutPage(),
+  '/address_list': (context)=>AddressListPage(),
+  '/address_add': (context)=>AddressAddPage(),
+  '/address_edit': (context)=>AddressEditPage(),
 };
 
 // ignore: prefer_function_declarations_over_variables

@@ -4,13 +4,15 @@ import 'package:flutter_jd/services/ScreenAdapter.dart';
 class JDText extends StatelessWidget {
   String text;
   bool password;
+  int maxLine;
+  double height;
   void Function(String)? onChange;
-  JDText({Key? key, this.text='输入内容', this.password=false, required, this.onChange}) : super(key: key);
+  JDText({Key? key, this.text='输入内容', this.password=false, this.maxLine=1, this.height=70, required, this.onChange}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: ScreenAdapter.height(70),
+      height: ScreenAdapter.height(height),
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
@@ -20,6 +22,7 @@ class JDText extends StatelessWidget {
         ),
       ),
       child: TextField(
+        maxLines: maxLine,
         obscureText: password,
         decoration: InputDecoration(
           hintText: '${text}',

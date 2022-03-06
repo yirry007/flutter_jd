@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_jd/services/SignServices.dart';
 import 'package:flutter_swiper_plus/flutter_swiper_plus.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
 import 'package:flutter_jd/model/FocusModel.dart';
@@ -30,6 +31,8 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     _getFocusData();
     _getHotProductData();
     _getBestProductData();
+
+    SignService.getSign({});
   }
 
   /// 获取轮播图数据
