@@ -7,7 +7,8 @@ class JDText extends StatelessWidget {
   int maxLine;
   double height;
   void Function(String)? onChange;
-  JDText({Key? key, this.text='输入内容', this.password=false, this.maxLine=1, this.height=70, required, this.onChange}) : super(key: key);
+  TextEditingController? controller;
+  JDText({Key? key, this.text='输入内容', this.password=false, this.maxLine=1, this.height=70, required this.onChange, this.controller}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +32,7 @@ class JDText extends StatelessWidget {
             borderRadius: BorderRadius.circular(30),
           ),
         ),
+        controller: controller,
         onChanged: onChange,
       ),
     );

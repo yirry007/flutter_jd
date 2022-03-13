@@ -9,4 +9,10 @@ class Api{
   static String validateCode = '${Api.Host}api/validateCode';
   static String register = '${Api.Host}api/register';
   static String doLogin = '${Api.Host}api/doLogin';
+  static String addAddress = '${Api.Host}api/addAddress';
+  static String addressList = '${Api.Host}api/addressList';
+  static String oneAddressList = '${Api.Host}api/oneAddressList';
+  static String changeDefaultAddress = '${Api.Host}api/changeDefaultAddress';
+  static String editAddress = '${Api.Host}api/editAddress';
+  static String deleteAddress = '${Api.Host}api/deleteAddress';
 }

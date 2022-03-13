@@ -1,7 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_jd/config/Api.dart';
 import 'package:flutter_jd/provider/CheckOut.dart';
+import 'package:flutter_jd/services/EventBus.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
+import 'package:flutter_jd/services/SignServices.dart';
+import 'package:flutter_jd/services/UserServices.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 class CheckOutPage extends StatefulWidget {
@@ -13,6 +18,48 @@ class CheckOutPage extends StatefulWidget {
 
 class _CheckOutPageState extends State<CheckOutPage> {
   var checkOutPrivider;
+  var addressEvent;
+  Map _addressList = {};
+
+  @override
+  void initState() {
+    super.initState();
+    
+    _getDefaultAddress();
+
+    addressEvent = eventBus.on<CheckOutEvent>().listen((event) {
+      _getDefaultAddress();
+    });
+  }
+
+  _getDefaultAddress() async{
+    List userinfo = await UserServices.getUserInfo();
+
+    Map tempJson = {
+      "uid": userinfo[0]['_id'],
+      "salt": userinfo[0]['salt'],
+    };
+
+    String sign = SignService.getSign(tempJson);
+
+    String api = '${Api.oneAddressList}?uid=${userinfo[0]['_id']}&sign=${sign}';
+    var response = await Dio().get(api);
+
+    if (!response.data['success']) {
+      Fluttertoast.showToast(
+        msg: "${response.data['message']}",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+      );
+      return;
+    }
+
+    if (response.data['result'].length > 0) {
+      setState(() {
+        _addressList = response.data['result'][0];
+      });
+    }
+  }
 
   Widget _checkOutItem(item){
     String imagePath = item['pic'];
@@ -71,30 +118,32 @@ class _CheckOutPageState extends State<CheckOutPage> {
                 color: Colors.white,
                 child: Column(
                   children: <Widget>[
-                    ListTile(
+                    _addressList.length == 0
+                    ?ListTile(
                       leading: Icon(Icons.add_location),
                       title: Center(
                         child: Text('请添加收货地址'),
                       ),
                       trailing: Icon(Icons.navigate_next),
                       onTap: (){
+                        Navigator.pushNamed(context, '/address_add');
+                      },
+                    )
+                    :ListTile(
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('${_addressList['name']} ${_addressList['phone']}'),
+                          SizedBox(height: 10),
+                          Text('${_addressList['address']}'),
+                        ],
+                      ),
+                      trailing: Icon(Icons.navigate_next),
+                      onTap: (){
                         Navigator.pushNamed(context, '/address_list');
                       },
                     ),
-
-                    // SizedBox(height: 10),
-                    // ListTile(
-                    //   title: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: <Widget>[
-                    //       Text('张三 15023948023'),
-                    //       SizedBox(height: 10),
-                    //       Text('吉林省延吉市北山街xxxxxxxxxx'),
-                    //     ],
-                    //   ),
-                    //   trailing: Icon(Icons.navigate_next),
-                    // ),
-                    // SizedBox(height: 10),
+                    SizedBox(height: 10),
                   ],
                 ),
               ),

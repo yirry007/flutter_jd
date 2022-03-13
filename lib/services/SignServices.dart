@@ -3,20 +3,14 @@ import 'package:crypto/crypto.dart';
 
 class SignService{
   static getSign(json){
-    Map addressListAttr = {
-      "uid": "1",
-      "age": 10,
-      "salt": "xxxxxxxxxxxxxxxxxxxxxxxxx",
-    };
-
-    List attrKeys = addressListAttr.keys.toList();
+    List attrKeys = json.keys.toList();
     attrKeys.sort();
 
     String str = '';
     for (int i=0;i<attrKeys.length;i++) {
-      str += '${attrKeys[i]}${addressListAttr[attrKeys[i]]}';
+      str += '${attrKeys[i]}${json[attrKeys[i]]}';
     }
 
-    print(md5.convert(utf8.encode(str)));
+    return md5.convert(utf8.encode(str)).toString();
   }
 }

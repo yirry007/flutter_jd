@@ -26,7 +26,7 @@ final routes = {
   '/checkout': (context)=>CheckOutPage(),
   '/address_list': (context)=>AddressListPage(),
   '/address_add': (context)=>AddressAddPage(),
-  '/address_edit': (context)=>AddressEditPage(),
+  '/address_edit': (context, {arguments})=>AddressEditPage(arguments: arguments),
 };
 
 // ignore: prefer_function_declarations_over_variables

@@ -13,3 +13,15 @@ class UserEvent{
 
   UserEvent({this.str});
 }
+
+class AddressEvent{
+  String? str;
+
+  AddressEvent({this.str});
+}
+
+class CheckOutEvent{
+  String? str;
+
+  CheckOutEvent({this.str});
+}
