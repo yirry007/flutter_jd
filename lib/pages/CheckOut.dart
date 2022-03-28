@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_jd/config/Api.dart';
+import 'package:flutter_jd/provider/Cart.dart';
 import 'package:flutter_jd/provider/CheckOut.dart';
+import 'package:flutter_jd/services/CheckOutServices.dart';
 import 'package:flutter_jd/services/EventBus.dart';
 import 'package:flutter_jd/services/ScreenAdapter.dart';
 import 'package:flutter_jd/services/SignServices.dart';
@@ -18,6 +22,7 @@ class CheckOutPage extends StatefulWidget {
 
 class _CheckOutPageState extends State<CheckOutPage> {
   var checkOutPrivider;
+  var cartProvider;
   var addressEvent;
   Map _addressList = {};
 
@@ -105,6 +110,8 @@ class _CheckOutPageState extends State<CheckOutPage> {
   @override
   Widget build(BuildContext context) {
     checkOutPrivider = Provider.of<CheckOut>(context);
+    cartProvider = Provider.of<Cart>(context);
+    String all_price = CheckOutServices.getAllPrice(checkOutPrivider.checkOutList);
     
     return Scaffold(
       appBar: AppBar(
@@ -204,14 +211,65 @@ class _CheckOutPageState extends State<CheckOutPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Text('总价: ￥140', style: TextStyle(
+                  Text('总价: ￥${all_price}', style: TextStyle(
                     color: Colors.red,
                   )),
                   ElevatedButton(
                     child: Text('立即下单', style: TextStyle(
                       color: Colors.white,
                     )),
-                    onPressed: (){},
+                    onPressed: () async{
+                      if (_addressList.length == 0) {
+                        Fluttertoast.showToast(
+                          msg: "请添加收货地址",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                        );
+                        return;
+                      }
+
+                      List userinfo = await UserServices.getUserInfo();
+
+                      //获取签名
+                      String sign = SignService.getSign({
+                        "uid": userinfo[0]['_id'],
+                        "phone": _addressList['phone'],
+                        "address": _addressList['address'],
+                        "name": _addressList['name'],
+                        "all_price": all_price,
+                        "products": json.encode(checkOutPrivider.checkOutList),
+                        "salt": userinfo[0]['salt'],
+                      });
+
+                      String api = Api.doOrder;
+                      var response = await Dio().post(api, data: {
+                        "uid": userinfo[0]['_id'],
+                        "phone": _addressList['phone'],
+                        "address": _addressList['address'],
+                        "name": _addressList['name'],
+                        "all_price": all_price,
+                        "products": json.encode(checkOutPrivider.checkOutList),
+                        "sign": sign,
+                      });
+
+                      if (!response.data['success']) {
+                        Fluttertoast.showToast(
+                          msg: "${response.data['message']}",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                        );
+                        return;
+                      }
+
+                      //删除购物车选中的商品数据，如果不加await，则下面的updateCartList()不会获取更新后的数据
+                      await CheckOutServices.removeSelectedCartItem();
+
+                      //调用CartProvider更新购物车数据
+                      cartProvider.updateCartList();
+                      
+                      //跳转到支付页面
+                      Navigator.pushNamed(context, '/pay');
+                    },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.red,
                     ),

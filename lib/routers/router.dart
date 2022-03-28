@@ -4,6 +4,9 @@ import 'package:flutter_jd/pages/Address/AddressEdit.dart';
 import 'package:flutter_jd/pages/Address/AddressList.dart';
 import 'package:flutter_jd/pages/CheckOut.dart';
 import 'package:flutter_jd/pages/Login.dart';
+import 'package:flutter_jd/pages/Order.dart';
+import 'package:flutter_jd/pages/OrderInfo.dart';
+import 'package:flutter_jd/pages/Pay.dart';
 import 'package:flutter_jd/pages/RegisterFirst.dart';
 import 'package:flutter_jd/pages/RegisterSecond.dart';
 import 'package:flutter_jd/pages/RegisterThird.dart';
@@ -27,6 +30,9 @@ final routes = {
   '/address_list': (context)=>AddressListPage(),
   '/address_add': (context)=>AddressAddPage(),
   '/address_edit': (context, {arguments})=>AddressEditPage(arguments: arguments),
+  '/pay': (context)=>PayPage(),
+  '/order': (context)=>OrderPage(),
+  '/order_info': (context, {arguments})=>OrderInfoPage(arguments: arguments),
 };
 
 // ignore: prefer_function_declarations_over_variables

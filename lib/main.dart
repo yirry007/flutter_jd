@@ -30,7 +30,7 @@ class _JDState extends State<JD> {
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
-          initialRoute: '/',
+          initialRoute: '/order',
           onGenerateRoute: onGenerateRoute,
           theme: ThemeData(
             //primarySwatch: primaryWhite,

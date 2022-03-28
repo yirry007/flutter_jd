@@ -15,4 +15,6 @@ class Api{
   static String changeDefaultAddress = '${Api.Host}api/changeDefaultAddress';
   static String editAddress = '${Api.Host}api/editAddress';
   static String deleteAddress = '${Api.Host}api/deleteAddress';
+  static String doOrder = '${Api.Host}api/doOrder';
+  static String orderList = '${Api.Host}api/orderList';
 }
